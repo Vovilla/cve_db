@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.core import serializers
 from .models import CVE, NetworkDevice
 from modules.base_parser import BaseParser
@@ -7,14 +8,15 @@ from modules.base_parser_settings import SETTINGS
 
 
 def show_cve(request, cve_name):
-    cve = CVE.objects.filter(name=cve_name)
-    response = serializers.serialize('json', cve)
-    return HttpResponse(response, content_type="text/json-comment-filtered")
+    cve = list(CVE.objects.filter(name__istartswith=cve_name).values())
+    list_result = [entry for entry in cve]
+    return JsonResponse(list_result, safe=False, json_dumps_params={'indent': 2})
 
 def load_cve(request):
+    CVE.objects.all().delete()
     bp = BaseParser(SETTINGS)
-    cve_base = bp.start()
-    for cve in cve_base:
+    bp.start()
+    for cve in bp.cve_db:
         cve_obj = CVE.objects.create(
                     name = cve['name'],
                     severity =  cve['severity'],

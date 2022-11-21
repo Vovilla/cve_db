@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import re
 import os
 from pprint import pprint
-from base_parser_settings import SETTINGS
+from .base_parser_settings import SETTINGS
 
 def extract_junos_range(string):
     junos_segments = []
@@ -125,6 +125,7 @@ class BaseParser:
         self.cve_db = []
         
     def start(self): 
+        cve_counter_base = dict()
         self.cve_db.clear()    
         for file in os.listdir(self.sources):
             if file.endswith('.html'):
@@ -137,10 +138,14 @@ class BaseParser:
                     tags = soup.find_all(text = True)  
                     cves = find_cves(tags)
                     for cve in cves:
+                        if cve not in cve_counter_base:
+                            cve_counter_base[cve] = 1
+                        else:
+                            cve_counter_base[cve] = cve_counter_base[cve] + 1
                         cve_obj = {
-                            'name': str(cve),
+                            'name': str(f"{cve}#{cve_counter_base[cve]}"),
                             'severity': str(severity),
-                            'url': 'url',
+                            'url': str(file),
                             'platforms': platforms.copy(),
                             'affected_junos': junos_ranges.copy(),  
                             'tags': ['tag', 'tag']

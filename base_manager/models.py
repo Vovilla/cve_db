@@ -3,18 +3,18 @@ from django.contrib.postgres.fields import ArrayField
 
 
 class CVE(models.Model):
-    name = models.CharField(max_length=200, default='CVE')
-    severity = models.CharField(max_length=200, default='Severity')
-    url = models.CharField(max_length=200, default='URL')
-    platforms = ArrayField(models.CharField(max_length=200, default='platform')) 
+    name = models.CharField(max_length=500, default='CVE', primary_key=True)
+    severity = models.CharField(max_length=500, default='Severity')
+    url = models.CharField(max_length=500, default='URL')
+    platforms = ArrayField(models.CharField(max_length=500, default='platform'), blank=True) 
     affected_junos = ArrayField(
-                         ArrayField(models.CharField(max_length=200, default='junos'),
+                         ArrayField(models.CharField(max_length=500, default='junos'),
                                     blank = True,
                                     size=2
                          ),
                          blank = True      
                      ) 
-    tags = ArrayField(models.CharField(max_length=200, default='tag')) 
+    tags = ArrayField(models.CharField(max_length=500, default='tag'), blank=True) 
     
     def __str__(self):
         return self.name
